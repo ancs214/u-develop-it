@@ -24,18 +24,45 @@ const db = mysql.createConnection(
 
 
 
-//db object is using query method to run SQL query and execute the callback with all the resulting rows from candidates
-// db.query(`SELECT * FROM candidates`, (err, rows) => {
-//     console.log('row');
-//   });
+  //create api endpoint to retrieve all candidates from candidates table:
+//db object is using query method to run SQL query and execute the callback with ALL rows from candidates
+app.get('/api/candidates', (req, res) => {
+    const sql = `SELECT * FROM candidates`;
+
+    db.query(sql, (err, rows) => {
+        if (err) {
+            //if theres an error, respond with a json object
+            //500 error = server error
+            res.status(500).json({ error:err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data:rows
+        });
+    });
+});
   
+
 // GET a single candidate
-// db.query(`SELECT * FROM candidates WHERE id = 1`, (err, row) => {
-//     if (err) {
-//       console.log(err);
-//     }
-//     console.log('row');
-//   });
+app.get('/api/candidate/:id', (req, res) => {
+    const sql = `SELECT * FROM candidates WHERE id = ?`;
+    //Because params can be accepted in the database call as an array, params is assigned as an array with a single element, req.params.id.
+    const params = [req.params.id];
+  
+    db.query(sql, params, (err, row) => {
+      if (err) {
+          //status code 400 to notify client their request wasnt accepted and to try a different request
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      res.json({
+        message: 'success',
+        data: row
+      });
+    });
+  });
+
 
   // Delete a candidate
   //DELETE statement has a question mark (?) that denotes a placeholder, making this a prepared statement. A prepared statement can execute the same SQL statements repeatedly using different values in place of the placeholder.
@@ -48,16 +75,16 @@ const db = mysql.createConnection(
 
 
 // Create a candidate
-const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected) 
-              VALUES (?,?,?,?)`;
-const params = [1, 'Ronald', 'Firbank', 1];
+// const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected) 
+//               VALUES (?,?,?,?)`;
+// const params = [1, 'Ronald', 'Firbank', 1];
 
-db.query(sql, params, (err, result) => {
-  if (err) {
-    console.log(err);
-  }
-  console.log(result);
-});
+// db.query(sql, params, (err, result) => {
+//   if (err) {
+//     console.log(err);
+//   }
+//   console.log(result);
+// });
 
 
 
