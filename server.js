@@ -24,11 +24,42 @@ const db = mysql.createConnection(
 
 
 
-//db object is using query method to run SQL query and execute the callback with all the resulting rows from candidates table
-db.query(`SELECT * FROM candidates`, (err, rows) => {
-    console.log(rows);
-  });
+//db object is using query method to run SQL query and execute the callback with all the resulting rows from candidates
+// db.query(`SELECT * FROM candidates`, (err, rows) => {
+//     console.log('row');
+//   });
   
+// GET a single candidate
+// db.query(`SELECT * FROM candidates WHERE id = 1`, (err, row) => {
+//     if (err) {
+//       console.log(err);
+//     }
+//     console.log('row');
+//   });
+
+  // Delete a candidate
+  //DELETE statement has a question mark (?) that denotes a placeholder, making this a prepared statement. A prepared statement can execute the same SQL statements repeatedly using different values in place of the placeholder.
+// db.query(`DELETE FROM candidates WHERE id = ?`, 1, (err, result) => {
+//     if (err) {
+//       console.log(err);
+//     }
+//     console.log(result);
+//   });
+
+
+// Create a candidate
+const sql = `INSERT INTO candidates (id, first_name, last_name, industry_connected) 
+              VALUES (?,?,?,?)`;
+const params = [1, 'Ronald', 'Firbank', 1];
+
+db.query(sql, params, (err, result) => {
+  if (err) {
+    console.log(err);
+  }
+  console.log(result);
+});
+
+
 
 
 
