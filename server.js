@@ -25,10 +25,10 @@ const db = mysql.createConnection(
 
 
   //create api endpoint to retrieve all candidates from candidates table:
-//db object is using query method to run SQL query and execute the callback with ALL rows from candidates
+//    (wrapped in an express.js route)
 app.get('/api/candidates', (req, res) => {
     const sql = `SELECT * FROM candidates`;
-
+    //db object is using SQL query method to execute the callback with all rows from candidates
     db.query(sql, (err, rows) => {
         if (err) {
             //if theres an error, respond with a json object
@@ -64,14 +64,29 @@ app.get('/api/candidate/:id', (req, res) => {
   });
 
 
-  // Delete a candidate
-  //DELETE statement has a question mark (?) that denotes a placeholder, making this a prepared statement. A prepared statement can execute the same SQL statements repeatedly using different values in place of the placeholder.
-// db.query(`DELETE FROM candidates WHERE id = ?`, 1, (err, result) => {
-//     if (err) {
-//       console.log(err);
-//     }
-//     console.log(result);
-//   });
+// Delete a candidate
+app.delete('/api/candidate/:id', (req, res) => {
+    const sql = `DELETE FROM candidates WHERE id = ?`;
+    const params = [req.params.id];
+  
+    db.query(sql, params, (err, result) => {
+      if (err) {
+        res.statusMessage(400).json({ error: res.message });
+        //if there are no affected rows (client tries to delete a candidate that doesnt exist), return message 'candidate not found'
+      } else if (!result.affectedRows) {
+        res.json({
+          message: 'Candidate not found'
+        });
+      } else {
+        res.json({
+          message: 'deleted',
+          changes: result.affectedRows,
+          id: req.params.id
+        });
+      }
+    });
+  });
+
 
 
 // Create a candidate
